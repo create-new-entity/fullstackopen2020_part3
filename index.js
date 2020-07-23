@@ -28,6 +28,8 @@ let notes = [
 ];
 
 
+app.use(express.json());
+
 app.get('/api/persons', (req, res) => {
   res.json(notes);
 });
@@ -48,6 +50,21 @@ app.get('/api/persons/:id', (req, res) => {
 app.delete('/api/persons/:id', (req, res) => {
   notes = notes.filter(note => note.id !== Number(req.params.id));
   res.status(204).send();
+});
+
+app.post('/api/persons', (req, res) => {
+  if(req.body.content){
+    let newNote = {};
+    newNote.content = req.body.content;
+    newNote.date = new Date();
+    req.body.important ? newNote.important = req.body.important : newNote.important = false;
+    newNote.id = notes.length + 1;
+    notes.push(newNote);
+    res.json(newNote); 
+  }
+  else res.status(400).json({
+    error: "Content Missing"
+  });
 });
 
 
