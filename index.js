@@ -26,6 +26,7 @@ let notes = [
   }
 ];
 
+
 app.get('/api/persons', (req, res) => {
   res.json(notes);
 });
@@ -35,6 +36,12 @@ app.get('/api/info', (req, res) => {
   <p>Phonebook has info of ${notes.length} people.</p>
   <p>${new Date()}</p>
   `);
+});
+
+app.get('/api/persons/:id', (req, res) => {
+  let note = notes.find(note => note.id === Number(req.params.id));
+  if(note) res.send(note.content);
+  else res.status(404).send('Not Found');
 });
 
 
