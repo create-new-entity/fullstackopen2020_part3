@@ -1,4 +1,5 @@
 const express = require('express');
+const { response } = require('express');
 
 const app = express();
 const PORT = 3001;
@@ -42,6 +43,11 @@ app.get('/api/persons/:id', (req, res) => {
   let note = notes.find(note => note.id === Number(req.params.id));
   if(note) res.send(note.content);
   else res.status(404).send('Not Found');
+});
+
+app.delete('/api/persons/:id', (req, res) => {
+  notes = notes.filter(note => note.id !== Number(req.params.id));
+  res.status(204).send();
 });
 
 
