@@ -32,6 +32,7 @@ morgan.token('body', (req, res) => {
 app.use(cors());
 app.use(express.json());
 app.use(morgan(':body'));
+app.use(express.static('build'));
 
 app.get('/api/persons', (req, res) => {
   res.json(contacts);
