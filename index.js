@@ -1,29 +1,25 @@
 const express = require('express');
-const { response } = require('express');
 
 const app = express();
 const PORT = 3001;
 
 
 
-let notes = [
+let contacts = [
   {
     id: 1,
-    content: "HTML is easy",
-    date: "2019-05-30T17:30:31.098Z",
-    important: true
+    name: "Snake",
+    number: "122-34-4545"
   },
   {
     id: 2,
-    content: "Browser can execute only Javascript",
-    date: "2019-05-30T18:39:34.091Z",
-    important: false
+    name: "Miller",
+    number: "122-34-423445"
   },
   {
     id: 3,
-    content: "GET and POST are the most important methods of HTTP protocol",
-    date: "2019-05-30T19:20:14.298Z",
-    important: true
+    content: "Rex",
+    date: "456-324-34"
   }
 ];
 
@@ -31,40 +27,57 @@ let notes = [
 app.use(express.json());
 
 app.get('/api/persons', (req, res) => {
-  res.json(notes);
+  res.json(contacts);
 });
 
 app.get('/api/info', (req, res) => {
   res.send(`
-  <p>Phonebook has info of ${notes.length} people.</p>
+  <p>Phonebook has info of ${contacts.length} people.</p>
   <p>${new Date()}</p>
   `);
 });
 
 app.get('/api/persons/:id', (req, res) => {
-  let note = notes.find(note => note.id === Number(req.params.id));
-  if(note) res.send(note.content);
+  let person = contacts.find(contact => contact.id === Number(req.params.id));
+  if(person) res.send(person.content);
   else res.status(404).send('Not Found');
 });
 
 app.delete('/api/persons/:id', (req, res) => {
-  notes = notes.filter(note => note.id !== Number(req.params.id));
+  contacts = contacts.filter(contact => contact.id !== Number(req.params.id));
   res.status(204).send();
 });
 
 app.post('/api/persons', (req, res) => {
-  if(req.body.content){
-    let newNote = {};
-    newNote.content = req.body.content;
-    newNote.date = new Date();
-    req.body.important ? newNote.important = req.body.important : newNote.important = false;
-    newNote.id = notes.length + 1;
-    notes.push(newNote);
-    res.json(newNote); 
-  }
-  else res.status(400).json({
-    error: "Content Missing"
-  });
+
+  if(!req.body.name){
+    res.status(400).json({
+      error: "Name Missing"
+    })
+    return;
+  };
+
+  if(!req.body.number){
+    res.status(400).json({
+      error: "Number Missing"
+    })
+    return;
+  };
+
+  found = contacts.find((contact) => contact.name === req.body.name);
+  if(found) {
+    res.status(409).json({
+      error: "Contact already exists."
+    });
+    return;
+  }  
+
+  let newContact = {};
+  newContact.name = req.body.name;
+  newContact.number = req.body.number;
+  newContact.id = contacts.length + 1;
+  contacts.push(newContact);
+  res.json(newContact); 
 });
 
 
