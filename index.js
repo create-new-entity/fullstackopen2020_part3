@@ -24,9 +24,13 @@ let contacts = [
   }
 ];
 
+morgan.token('body', (req, res) => {
+  return JSON.stringify(req.body);
+})
+
 
 app.use(express.json());
-app.use(morgan('tiny'));
+app.use(morgan(':body'));
 
 app.get('/api/persons', (req, res) => {
   res.json(contacts);
