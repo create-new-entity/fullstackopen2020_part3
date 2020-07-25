@@ -59,20 +59,31 @@ app.post('/api/persons', (req, res) => {
     return;
   };
 
-  found = contacts.find((contact) => contact.name === req.body.name);
-  if(found) {
-    res.status(409).json({
-      error: "Contact already exists."
-    });
-    return;
-  }  
 
-  let newContact = {};
-  newContact.name = req.body.name;
-  newContact.number = req.body.number;
-  newContact.id = contacts.length + 1;
-  contacts.push(newContact);
-  res.json(newContact); 
+  Person
+    .find({ name: req.body.name })
+    .then(result => {
+
+      if(result.length) res.status(409).json({
+        error: "Contact already exists."
+      });
+
+      let newPerson = new Person({
+        name: req.body.name,
+        number: req.body.number
+      });
+
+      newPerson
+        .save()
+        .then((result) => {
+          res.status(201).json(result);
+        })
+        .catch((error) => {
+          res.status(500).json(error);
+        });
+        
+    });
+
 });
 
 
