@@ -21,7 +21,7 @@ app.get('/api/persons', (req, res) => {
     .find({})
     .then(result => res.json(result))
     .catch(error => {
-      res.status(500).end();
+      next(error);
     });
 });
 
@@ -38,7 +38,7 @@ app.get('/api/persons/:id', (req, res) => {
   else res.status(404).send('Not Found');
 });
 
-app.delete('/api/persons/:id', (req, res) => {
+app.delete('/api/persons/:id', (req, res, next) => {
   console.log(req.params.id);
   Person
     .findByIdAndRemove(req.params.id)
@@ -47,7 +47,7 @@ app.delete('/api/persons/:id', (req, res) => {
       res.json(result);
     })
     .catch(error => {
-      res.status(500).json(error);
+      next(error);
     });
 });
 
@@ -93,6 +93,14 @@ app.post('/api/persons', (req, res) => {
     });
 
 });
+
+
+const errorHandler = (error, req, res, next) => {
+  console.log(error);
+  res.json(error);
+};
+
+app.use(errorHandler);
 
 
 app.listen(PORT);
