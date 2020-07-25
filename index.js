@@ -2,28 +2,10 @@ const express = require('express');
 const morgan = require('morgan');
 const cors = require('cors')
 
+const Person = require('./models/Person');
+
 const app = express();
 const PORT = process.env.PORT || 3001;
-
-
-
-let contacts = [
-  {
-    id: 1,
-    name: "Snake",
-    number: "122-34-4545"
-  },
-  {
-    id: 2,
-    name: "Miller",
-    number: "122-34-423445"
-  },
-  {
-    id: 3,
-    name: "Rex",
-    date: "456-324-34"
-  }
-];
 
 morgan.token('body', (req, res) => {
   return JSON.stringify(req.body);
@@ -35,7 +17,12 @@ app.use(morgan(':body'));
 app.use(express.static('build'));
 
 app.get('/api/persons', (req, res) => {
-  res.json(contacts);
+  Person
+    .find({})
+    .then(result => res.json(result))
+    .catch(error => {
+      res.status(500).end();
+    });
 });
 
 app.get('/api/info', (req, res) => {
