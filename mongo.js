@@ -18,5 +18,7 @@ mongoose
     console.log('DB connection failed')
   });
 
+mongoose.set('useCreateIndex', true);
+
 module.exports = mongoose;
 

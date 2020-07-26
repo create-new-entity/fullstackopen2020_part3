@@ -68,7 +68,7 @@ app.put('/api/persons/:id', (req, res) => {
     .catch(error => next(error));
 });
 
-app.post('/api/persons', (req, res) => {
+app.post('/api/persons', (req, res, next) => {
 
   if(!req.body.name){
     res.status(400).json({
@@ -85,35 +85,51 @@ app.post('/api/persons', (req, res) => {
   };
 
 
-  Person
-    .find({ name: req.body.name })
-    .then(result => {
+  // Person
+  //   .find({ name: req.body.name })
+  //   .then(result => {
 
-      if(result.length) res.status(409).json({
-        error: "Contact already exists."
-      });
+  //     if(result.length) res.status(409).json({
+  //       error: "Contact already exists."
+  //     });
 
-      let newPerson = new Person({
+  //     let newPerson = new Person({
+  //       name: req.body.name,
+  //       number: req.body.number
+  //     });
+
+  //     newPerson
+  //       .save()
+  //       .then((result) => {
+  //         res.status(201).json(result);
+  //       })
+  //       .catch((error) => {
+  //         res.status(500).json(error);
+  //       });
+        
+  //   });
+
+  new Person(
+      {
         name: req.body.name,
         number: req.body.number
-      });
-
-      newPerson
-        .save()
-        .then((result) => {
-          res.status(201).json(result);
-        })
-        .catch((error) => {
-          res.status(500).json(error);
-        });
-        
-    });
+      }
+    )
+    .save()
+    .then(result => res.status(200).json(result))
+    .catch(error => next(error));
 
 });
 
 
 const errorHandler = (error, req, res, next) => {
-  res.json(error);
+  
+  if(error.errors.name.kind === "unique"){
+    res.status(409).json({
+      error: error.message
+    })
+  }
+  else res.status(404).json(error);
 };
 
 app.use(errorHandler);
