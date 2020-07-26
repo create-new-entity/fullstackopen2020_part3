@@ -25,21 +25,29 @@ app.get('/api/persons', (req, res) => {
     });
 });
 
-app.get('/api/info', (req, res) => {
-  res.send(`
-  <p>Phonebook has info of ${contacts.length} people.</p>
-  <p>${new Date()}</p>
-  `);
+app.get('/api/info', (req, res, error) => {
+  Person
+    .countDocuments({})
+    .then((result) => {
+      res.send(`
+        <p>Phonebook has info of ${result} people.</p>
+        <p>${new Date()}</p>
+      `)
+    })
+    .catch(error => next(error));
+  ;
 });
 
 app.get('/api/persons/:id', (req, res) => {
-  let person = contacts.find(contact => contact.id === Number(req.params.id));
-  if(person) res.send(person);
-  else res.status(404).send('Not Found');
+  Person
+    .findById(req.params.id)
+    .then((result) => {
+      res.json(result);
+    })
+    .catch((error) => next(error));
 });
 
 app.delete('/api/persons/:id', (req, res, next) => {
-  console.log(req.params.id);
   Person
     .findByIdAndRemove(req.params.id)
     .then(result => {
@@ -105,7 +113,6 @@ app.post('/api/persons', (req, res) => {
 
 
 const errorHandler = (error, req, res, next) => {
-  console.log(error);
   res.json(error);
 };
 
