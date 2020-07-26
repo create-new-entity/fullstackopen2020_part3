@@ -59,11 +59,16 @@ app.delete('/api/persons/:id', (req, res, next) => {
     });
 });
 
-app.put('/api/persons/:id', (req, res) => {
+app.put('/api/persons/:id', (req, res, next) => {
   Person
-    .findByIdAndUpdate(req.params.id, { number: req.body.number }, { new: true })
+    .findByIdAndUpdate(req.params.id, { number: req.body.number }, { new: true, runValidators: true })
     .then(result => {
-      res.status(200).json(result);
+      if(result) res.status(200).json(result);
+      else {
+        let error = new Error;
+        error.name = "NotFound";
+        throw error;
+      }
     })
     .catch(error => next(error));
 });
@@ -84,31 +89,7 @@ app.post('/api/persons', (req, res, next) => {
     return;
   };
 
-
-  // Person
-  //   .find({ name: req.body.name })
-  //   .then(result => {
-
-  //     if(result.length) res.status(409).json({
-  //       error: "Contact already exists."
-  //     });
-
-  //     let newPerson = new Person({
-  //       name: req.body.name,
-  //       number: req.body.number
-  //     });
-
-  //     newPerson
-  //       .save()
-  //       .then((result) => {
-  //         res.status(201).json(result);
-  //       })
-  //       .catch((error) => {
-  //         res.status(500).json(error);
-  //       });
-        
-  //   });
-
+  
   new Person(
       {
         name: req.body.name,
@@ -117,17 +98,20 @@ app.post('/api/persons', (req, res, next) => {
     )
     .save()
     .then(result => res.status(200).json(result))
-    .catch(error => next(error));
-
+    .catch(error => {
+      next(error);
+    });
 });
 
 
 const errorHandler = (error, req, res, next) => {
-  
-  if(error.errors.name.kind === "unique"){
-    res.status(409).json({
+  if(error.name === 'ValidationError'){
+    res.status(400).json({
       error: error.message
-    })
+    });
+  }
+  else if(error.name === 'NotFound'){
+    res.status(404).send();
   }
   else res.status(404).json(error);
 };
