@@ -51,6 +51,15 @@ app.delete('/api/persons/:id', (req, res, next) => {
     });
 });
 
+app.put('/api/persons/:id', (req, res) => {
+  Person
+    .findByIdAndUpdate(req.params.id, { number: req.body.number }, { new: true })
+    .then(result => {
+      res.status(200).json(result);
+    })
+    .catch(error => next(error));
+});
+
 app.post('/api/persons', (req, res) => {
 
   if(!req.body.name){
