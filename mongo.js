@@ -14,8 +14,7 @@ mongoose
     console.log('DB connected')
   )
   .catch(error => {
-    console.log(error);
-    console.log('DB connection failed')
+    console.log('DB connection failed', error);
   });
 
 mongoose.set('useCreateIndex', true);
